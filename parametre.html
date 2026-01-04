@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paramètre</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #2c3e50; color: #fff; }
+    /* Menu */
+    #sidebar { position: fixed; top: 0; left: 0; width: 220px; height: 100%; background-color: #34495e; padding-top: 20px; box-sizing: border-box; }
+    #sidebar .logo img { display: block; margin: 0 auto 20px auto; max-width: 150px; }
+    #sidebar ul { list-style: none; padding: 0; }
+    #sidebar ul li { margin: 15px 0; }
+    #sidebar ul li a { color: #fff; text-decoration: none; font-size: 1.1em; display: flex; align-items: center; gap: 10px; padding: 5px 15px; border-radius: 8px; transition: background 0.3s; }
+    #sidebar ul li a:hover, #sidebar ul li a.active { background-color: #e67e22; }
+
+    /* Contenu principal */
+    main { margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+    .main-title { text-align: center; font-size: 2.3em; margin-bottom: 30px; }
+
+    .form-container { display: flex; flex-direction: row; gap: 20px; max-width: 1200px; width: 100%; margin: 0 auto; }
+    @media (max-width: 900px) { .form-container { flex-direction: column; } }
+
+    .form-section { background-color: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); flex: 1 1 48%; }
+    .form-section h2 { text-align: center; margin-bottom: 15px; }
+    .form-group { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
+    .form-group label { width: 140px; font-weight: bold; padding-right: 10px; }
+    .form-group input, .form-group select { flex: 1; padding: 6px 10px; border-radius: 5px; border: none; outline: none; }
+    .form-group input:focus, .form-group select:focus { box-shadow: 0 0 5px rgba(255,255,255,0.6); }
+
+    .form-section button { display: block; margin: 10px auto 0; padding: 8px 20px; background-color: #e67e22; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; transition: background-color 0.3s ease, transform 0.2s ease; }
+    .form-section button:hover { background-color: #d35400; transform: scale(1.05); }
+
+    .table-form { width: 100%; border-collapse: collapse; }
+    .table-form th, .table-form td { padding: 5px 8px; text-align: left; }
+    .table-form th { background-color: rgba(0,0,0,0.3); }
+
+    .table-form td input[type="number"] { width: 50px; }
+    .table-form td input[type="text"] { width: 120px; }
+    .table-form td select { width: 80px; }
+
+    .table-form button { padding: 1px 4px; font-size: 0.6em; border-radius: 3px; background-color: #e74c3c; color: #fff; border: none; cursor: pointer; }
+    .table-form button:hover { background-color: #c0392b; transform: scale(1.2); }
+</style>
+</head>
+<body>
+
+<!-- Menu -->
+<nav id="sidebar">
+    <div class="logo"><img src="logo.png" alt="Logo"></div>
+    <ul>
+        <li><a href="parametre.html" class="active"><i class="fas fa-cog"></i> Paramètre</a></li>
+        <li><a href="index.html"><i class="fas fa-users"></i> Liste Nominative</a></li>
+        <li><a href="trimestre1.html"><i class="fas fa-calendar-check"></i> Trimestre 1</a></li>
+        <li><a href="trimestre2.html"><i class="fas fa-calendar-day"></i> Trimestre 2</a></li>
+        <li><a href="trimestre3.html"><i class="fas fa-calendar-alt"></i> Trimestre 3</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="main-title"><h1>Paramètre</h1></section>
+    <div class="form-container">
+
+        <!-- Informations Établissement -->
+        <div class="form-section">
+            <h2>Informations Établissement</h2>
+            <form id="infosForm">
+                <div class="form-group"><label for="annee">Année Scolaire:</label><input type="text" id="annee" name="annee" placeholder="Ex: 2025-2026"></div>
+                <div class="form-group"><label for="ia">IA:</label><input type="text" id="ia" name="ia"></div>
+                <div class="form-group"><label for="ief">IEF:</label><input type="text" id="ief" name="ief"></div>
+                <div class="form-group"><label for="district">DISTRICT:</label><input type="text" id="district" name="district"></div>
+                <div class="form-group"><label for="codec">CODEC:</label><input type="text" id="codec" name="codec"></div>
+                <div class="form-group"><label for="etablissement">Établissement:</label><input type="text" id="etablissement" name="etablissement"></div>
+                <div class="form-group"><label for="chef">Chef d'Établissement:</label><input type="text" id="chef" name="chef"></div>
+                <button type="submit">Enregistrer Informations</button>
+            </form>
+        </div>
+
+        <!-- Liste des Cours Dynamique -->
+        <div class="form-section">
+            <h2>Liste des Cours</h2>
+            <form id="coursForm">
+                <table class="table-form" id="coursTable">
+                    <thead>
+                        <tr>
+                            <th>N°</th><th>COURS</th><th>TYPE</th><th>TENU PAR</th><th>SUPPRIMER</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="number" name="num1" value="1" readonly></td>
+                            <td><input type="text" name="cours1" placeholder="Nom du cours"></td>
+                            <td>
+                                <select name="type1">
+                                    <option value="" selected></option>
+                                    <option value="SIMPLE">SIMPLE</option>
+                                    <option value="CMG">CMG</option>
+                                    <option value="CDF">CDF</option>
+                                </select>
+                            </td>
+                            <td><input type="text" name="tenu1" placeholder="Nom de l'enseignant"></td>
+                            <td><button type="button" onclick="supprimerLigne(this)">❌</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="text-align:center; margin-top:10px;">
+                    <button type="button" onclick="ajouterLigne()">➕ Ajouter un cours</button>
+                    <button type="submit">Enregistrer Cours</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script>
+let compteur = 1;
+
+// Ajouter une ligne
+function ajouterLigne() {
+    compteur++;
+    const table = document.getElementById('coursTable').getElementsByTagName('tbody')[0];
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td><input type="number" name="num${compteur}" value="${compteur}" readonly></td>
+        <td><input type="text" name="cours${compteur}" placeholder="Nom du cours"></td>
+        <td>
+            <select name="type${compteur}">
+                <option value="" selected></option>
+                <option value="SIMPLE">SIMPLE</option>
+                <option value="CMG">CMG</option>
+                <option value="CDF">CDF</option>
+            </select>
+        </td>
+        <td><input type="text" name="tenu${compteur}" placeholder="Nom de l'enseignant"></td>
+        <td><button type="button" onclick="supprimerLigne(this)">❌</button></td>
+    `;
+    table.appendChild(newRow);
+}
+
+// Supprimer une ligne
+function supprimerLigne(button) {
+    const row = button.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    const rows = document.getElementById('coursTable').querySelectorAll('tbody tr');
+    compteur = rows.length;
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].querySelector('td input[type="number"]').value = i + 1;
+        rows[i].querySelector('td input[type="number"]').name = 'num' + (i + 1);
+        rows[i].querySelector('td input[type="text"]').name = 'cours' + (i + 1);
+        rows[i].querySelector('select').name = 'type' + (i + 1);
+        rows[i].querySelectorAll('td input[type="text"]')[1].name = 'tenu' + (i + 1);
+    }
+}
+
+// --- Enregistrement LocalStorage ---
+
+const infosForm = document.getElementById('infosForm');
+const coursForm = document.getElementById('coursForm');
+
+// Charger les données
+window.onload = function() {
+    const infos = JSON.parse(localStorage.getItem('infosEtablissement'));
+    if(infos){
+        for(let key in infos){
+            const input = document.getElementById(key);
+            if(input) input.value = infos[key];
+        }
+    }
+
+    const coursData = JSON.parse(localStorage.getItem('listeCours'));
+    if(coursData){
+        const tbody = document.getElementById('coursTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        compteur = 0;
+        coursData.forEach(c => {
+            compteur++;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="number" name="num${compteur}" value="${compteur}" readonly></td>
+                <td><input type="text" name="cours${compteur}" value="${c.cours}"></td>
+                <td>
+                    <select name="type${compteur}">
+                        <option value="" ${c.type===''?'selected':''}></option>
+                        <option value="SIMPLE" ${c.type==='SIMPLE'?'selected':''}>SIMPLE</option>
+                        <option value="CMG" ${c.type==='CMG'?'selected':''}>CMG</option>
+                        <option value="CDF" ${c.type==='CDF'?'selected':''}>CDF</option>
+                    </select>
+                </td>
+                <td><input type="text" name="tenu${compteur}" value="${c.tenu}"></td>
+                <td><button type="button" onclick="supprimerLigne(this)">❌</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+}
+
+// Sauvegarder infos établissement
+infosForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const inputs = infosForm.querySelectorAll('input');
+    let data = {};
+    inputs.forEach(input => data[input.id] = input.value);
+    localStorage.setItem('infosEtablissement', JSON.stringify(data));
+    alert('Informations établissement enregistrées !');
+});
+
+// Sauvegarder liste des cours
+coursForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const rows = document.getElementById('coursTable').querySelectorAll('tbody tr');
+    let coursData = [];
+    rows.forEach(row => {
+        const tds = row.querySelectorAll('td');
+        coursData.push({
+            cours: tds[1].querySelector('input').value,
+            type: tds[2].querySelector('select').value,
+            tenu: tds[3].querySelector('input').value
+        });
+    });
+    localStorage.setItem('listeCours', JSON.stringify(coursData));
+    alert('Cours enregistrés !');
+});
+</script>
+
+</body>
+</html>

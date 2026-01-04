@@ -1,0 +1,247 @@
+/* style.css - version pro colorée avec effets */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Menu */
+nav {
+    width: 220px;
+    background-color: #1abc9c;
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    transition: width 0.4s ease, background-color 0.4s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+nav.collapsed {
+    width: 60px;
+}
+
+/* Logo */
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+    opacity: 1;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+nav.collapsed .logo {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.logo img {
+    max-width: 150px;
+    border-radius: 10px;
+}
+
+/* Hamburger bouton */
+.hamburger {
+    cursor: pointer;
+    font-size: 2em;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+.hamburger:hover {
+    transform: rotate(90deg);
+}
+
+/* Menu liens */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    margin: 15px 0;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+nav ul li a:hover {
+    background-color: #16a085;
+    transform: translateX(8px);
+}
+
+nav ul li a.active {
+    background-color: #e67e22;
+}
+
+/* Contenu principal */
+main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow-y: auto;
+    transition: margin-left 0.4s ease;
+}
+
+nav.collapsed ~ main {
+    margin-left: 60px;
+}
+
+/* Titres animés et colorés */
+h1 {
+    font-size: 4em;
+    text-align: center;
+    color: #fff;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s forwards;
+    padding: 20px 50px;
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Effet survol titres */
+h1:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Animation titre */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Couleurs de fond selon rubrique */
+body.parametre main {
+    background-color: #3498db;
+}
+
+body.index main {
+    background-color: #9b59b6;
+}
+
+body.trimestre1 main {
+    background-color: #e67e22;
+}
+
+body.trimestre2 main {
+    background-color: #2ecc71;
+}
+
+body.trimestre3 main {
+    background-color: #e74c3c;
+}
+
+/* Responsive mobile */
+@media screen and (max-width: 768px) {
+    nav {
+        width: 0;
+        overflow: hidden;
+        z-index: 10;
+    }
+    nav.collapsed {
+        width: 220px;
+    }
+    main {
+        margin-left: 0;
+    }
+}
+
+nav ul li a i {
+    margin-right: 10px;
+    width: 20px; /* espace uniforme pour toutes les icônes */
+    text-align: center;
+}
+
+.form-section {
+    padding: 20px; /* auparavant 30px */
+}
+
+.form-group {
+    margin-bottom: 10px; /* auparavant 15px */
+}
+
+/* Conteneur bas : Informations à gauche, Cours à droite */
+.form-container {
+    display: flex;
+    flex-direction: row; /* horizontal pour grand écran */
+    gap: 20px;           /* espace entre les sections */
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Responsive : empiler verticalement sur petits écrans */
+@media (max-width: 900px) {
+    .form-container {
+        flex-direction: column;
+    }
+}
+
+.table-form td input[type="number"] {
+    width: 50px; /* case N° plus petite */
+}
+
+.table-form td input[type="text"] {
+    width: 120px; /* case COURS plus petite */
+}
+
+.table-form td select {
+    width: 80px; /* case TYPE réduite */
+}
+.table-form button {
+    padding: 2px 6px;       /* réduit le padding */
+    font-size: 0.8em;       /* petite taille de texte */
+    border-radius: 4px;     /* coins légèrement arrondis */
+    background-color: #e74c3c; /* rouge vif pour supprimer */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.table-form button:hover {
+    background-color: #c0392b; /* rouge foncé au survol */
+    transform: scale(1.1);
+}
+
+/* Bouton Supprimer ultra petit */
+.table-form button {
+    padding: 1px 4px;      /* padding très réduit */
+    font-size: 0.6em;      /* texte encore plus petit */
+    border-radius: 3px;    /* coins arrondis très petits */
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.table-form button:hover {
+    background-color: #c0392b;
+    transform: scale(1.2); /* petit effet hover pour cliquer facilement */
+}
+

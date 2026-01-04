@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trimestre 1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="trimestre1">
+
+    <nav id="sidebar">
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <ul>
+            <li><a href="parametre.html">Paramètre</a></li>
+            <li><a href="index.html">Liste Nominative</a></li>
+            <li><a href="trimestre1.html" class="active">Trimestre 1</a></li>
+            <li><a href="trimestre2.html">Trimestre 2</a></li>
+            <li><a href="trimestre3.html">Trimestre 3</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section>
+            <h1>Trimestre 1</h1>
+        </section>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+    </script>
+
+</body>
+</html>

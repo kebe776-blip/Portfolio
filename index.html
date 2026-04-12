@@ -41,6 +41,16 @@ header h1{font-size:1.5rem;font-weight:800}
 .lc svg{color:var(--p)}
 .lc h2{margin:1rem 0 .5rem;font-size:1.6rem}
 .lc p{color:var(--tm);margin-bottom:1.5rem;font-size:.9rem}
+.auth-tabs{display:flex;margin-bottom:1.5rem;border-bottom:2px solid #e5e7eb}
+.auth-tab{flex:1;padding:.75rem;font-size:.85rem;font-weight:600;color:var(--tm);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.auth-tab:hover,.auth-tab.act{color:var(--p);border-bottom-color:var(--p)}
+.auth-panel{display:none}.auth-panel.act{display:block}
+.auth-error{color:#ef4444;font-size:.85rem;margin-bottom:.5rem;display:none}
+.auth-msg{color:#16a34a;font-size:.85rem;margin-bottom:.5rem;display:none}
+.badge-admin{background:#fef3c7;color:#d97706;font-size:.7rem;font-weight:700;padding:.15rem .5rem;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;vertical-align:middle;margin-left:.5rem}
+.badge-ok{background:#dcfce7;color:#16a34a;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:20px}
+.badge-wait{background:#fef3c7;color:#d97706;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:20px}
+.badge-off{background:#fee2e2;color:#ef4444;font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:20px}
 
 /* FORMS */
 .fg{margin-bottom:1rem}.fg.inline{display:inline-block;margin-right:1rem}
@@ -209,11 +219,31 @@ td.acts{text-align:right;white-space:nowrap}
 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10l-10 5L2 10l10-5 10 5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg>
 <h2>EcoGestion</h2>
 <p>Administration Scolaire Primaire</p>
+<div class="auth-tabs">
+<button type="button" class="auth-tab act" onclick="switchAuthTab('login')">Connexion</button>
+<button type="button" class="auth-tab" onclick="switchAuthTab('register')">Inscription</button>
+</div>
+<div class="auth-error" id="auth-error"></div>
+<div class="auth-msg" id="auth-msg"></div>
+
+<div class="auth-panel act" id="panel-login">
 <form id="login-form">
-<div class="fg"><label class="fl">Identifiant</label><input class="fi" id="username" placeholder="Directeur" required></div>
-<div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required></div>
+<div class="fg"><label class="fl">Identifiant</label><input class="fi" id="username" placeholder="Votre identifiant" required autocomplete="username"></div>
+<div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" id="login-pass" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required autocomplete="current-password"></div>
 <button type="submit" class="btn btn-p" style="width:100%;justify-content:center;margin-top:.5rem">Connexion</button>
 </form>
+</div>
+
+<div class="auth-panel" id="panel-register">
+<form id="register-form">
+<div class="fg"><label class="fl">Nom complet</label><input class="fi" id="reg-name" placeholder="Ex: M. Jean Dupont" required></div>
+<div class="fg"><label class="fl">Identifiant</label><input class="fi" id="reg-username" placeholder="Votre identifiant unique" required autocomplete="username"></div>
+<div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" id="reg-pass" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required minlength="4" autocomplete="new-password"></div>
+<div class="fg"><label class="fl">Confirmer le mot de passe</label><input type="password" class="fi" id="reg-pass2" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required autocomplete="new-password"></div>
+<div class="fg"><label class="fl">Nom de l'etablissement</label><input class="fi" id="reg-school" placeholder="Ex: Ecole Primaire de Dakar"></div>
+<button type="submit" class="btn btn-p" style="width:100%;justify-content:center;margin-top:.5rem">Creer mon compte</button>
+</form>
+</div>
 </div>
 </section>
 
@@ -232,12 +262,13 @@ EcoGestion
 <button class="ni" data-v="personnel"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Personnel</button>
 <div class="st">Paramètre</div>
 <button class="ni" data-v="settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Paramètres</button>
+<button class="ni admin-only" data-v="admin-users" style="display:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Gestion Comptes</button>
 <button class="ni" data-v="courses"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Cours & Matieres</button>
 <button class="ni" data-v="notes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Bulletins</button>
 </nav>
 <div class="up">
 <div class="avatar" id="user-avatar">DR</div>
-<div style="min-width:0"><div style="font-weight:600;font-size:.9rem" id="user-name">Directeur</div><div style="font-size:.75rem;color:var(--tm)">Administrateur</div></div>
+<div style="min-width:0"><div style="font-weight:600;font-size:.9rem" id="user-name">Directeur</div><div style="font-size:.75rem;color:var(--tm)" id="user-role">Administrateur</div></div>
 <button class="bi" onclick="doLogout()" style="margin-left:auto" title="Deconnexion"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
 </div>
 </aside>
@@ -558,6 +589,24 @@ EcoGestion
 </div>
 </div>
 
+<!-- ADMIN GESTION COMPTES -->
+<div id="v-admin-users" class="hidden">
+<header><div><h1>Gestion des Comptes <span class="badge-admin">Admin</span></h1></div></header>
+<div class="sg" id="admin-stats" style="margin-bottom:1.5rem"></div>
+<div style="background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden">
+<div style="padding:1.25rem 1.5rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+<h3 style="font-size:.85rem;text-transform:uppercase;color:var(--tm);font-weight:700;letter-spacing:.05em;flex:1">Liste des utilisateurs</h3>
+<div style="display:flex;gap:.5rem;flex-wrap:wrap">
+<button class="btn btn-p btn-sm" onclick="filterAdminUsers('all')" id="filter-all">Tous</button>
+<button class="btn btn-g btn-sm" onclick="filterAdminUsers('pending')" id="filter-pending">En attente</button>
+<button class="btn btn-g btn-sm" onclick="filterAdminUsers('approved')" id="filter-approved">Actives</button>
+<button class="btn btn-g btn-sm" onclick="filterAdminUsers('disabled')" id="filter-disabled">Desactivees</button>
+</div>
+</div>
+<div id="admin-users-list"></div>
+</div>
+</div>
+
 <!-- PARAMETRES -->
 <div id="v-settings" class="hidden">
 <header><div><h1>Paramètres de l'Etablissement</h1></div></header>
@@ -648,10 +697,22 @@ let DB = {
     essais: [],
     settings: { anneeScolaire: '2024-2025', ia: '', ief: '', district: '', codec: '', nomEtablissement: 'Ecole Primaire', typeEtablissement: '', anneeCreation: '', chefTitre: 'Monsieur', chefPrenom: '', chefNom: '', schoolName: 'Ecole Primaire', directorName: '', year: '2024-2025' }
 };
+let currentUser = null;
+
+function getUsers() {
+    try { return JSON.parse(localStorage.getItem('ecogestion_users')) || {}; } catch(e) { return {}; }
+}
+function saveUsers(users) {
+    try { localStorage.setItem('ecogestion_users', JSON.stringify(users)); } catch(e) {}
+}
+function userDBKey(username) {
+    return 'ecogestion_db_' + username.toLowerCase();
+}
 
 function loadDB() {
+    if (!currentUser) return;
     try {
-        const s = localStorage.getItem('ecogestion_db');
+        const s = localStorage.getItem(userDBKey(currentUser));
         if (s) DB = JSON.parse(s);
     } catch(e) {}
     if (!DB.students) DB.students = [];
@@ -674,49 +735,256 @@ function loadDB() {
 }
 
 function saveDB() {
-    try { localStorage.setItem('ecogestion_db', JSON.stringify(DB)); } catch(e) {}
+    if (!currentUser) return;
+    try { localStorage.setItem(userDBKey(currentUser), JSON.stringify(DB)); } catch(e) {}
 }
 
 // ==================== STATE ====================
 let ctx = { class: null, trimester: 1, editSubIdx: null, studentPage: 1, pageSize: 15 };
 
 // ==================== INIT ====================
+const ADMIN_UID = 'admin';
+const ADMIN_PASS = 'admin123';
+let isAdmin = false;
+let adminFilter = 'all';
+
 document.addEventListener('DOMContentLoaded', () => {
-    loadDB();
-    const saved = localStorage.getItem('ecogestion_auth');
-    if (saved) {
-        document.getElementById('auth').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('user-name').textContent = saved;
-        document.getElementById('user-avatar').textContent = saved.substring(0,2).toUpperCase();
-        DB.settings.directorName = saved;
-        renderDash();
+    const savedSession = localStorage.getItem('ecogestion_session');
+    const savedAdmin = localStorage.getItem('ecogestion_admin');
+    // Migrate old single-user data if exists
+    const oldData = localStorage.getItem('ecogestion_db');
+    if (oldData && !localStorage.getItem('ecogestion_users')) {
+        const users = {};
+        users['directeur'] = { name: 'Directeur', password: 'admin', school: 'Ecole Primaire', created: new Date().toISOString(), status: 'approved' };
+        saveUsers(users);
+        localStorage.setItem('ecogestion_db_directeur', oldData);
+        localStorage.removeItem('ecogestion_db');
+    }
+    if (savedAdmin === 'true') {
+        isAdmin = true;
+        currentUser = null;
+        showApp({ name: 'Administrateur', school: 'EcoGestion - Gestion Systeme' }, true);
+    } else if (savedSession) {
+        const users = getUsers();
+        const info = users[savedSession];
+        if (info) {
+            currentUser = savedSession;
+            loadDB();
+            showApp(info, false);
+        } else {
+            localStorage.removeItem('ecogestion_session');
+        }
     }
     document.getElementById('login-form').addEventListener('submit', e => {
         e.preventDefault();
-        const u = document.getElementById('username').value.trim() || 'Directeur';
-        localStorage.setItem('ecogestion_auth', u);
-        document.getElementById('auth').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        document.getElementById('user-name').textContent = u;
-        document.getElementById('user-avatar').textContent = u.substring(0,2).toUpperCase();
-        DB.settings.directorName = u;
-        saveDB();
-        renderDash();
+        const uid = document.getElementById('username').value.trim().toLowerCase();
+        const pass = document.getElementById('login-pass').value;
+        if (!uid || !pass) { showAuthError('Veuillez remplir tous les champs.'); return; }
+        // Check admin login
+        if (uid === ADMIN_UID && pass === ADMIN_PASS) {
+            isAdmin = true;
+            currentUser = null;
+            localStorage.setItem('ecogestion_admin', 'true');
+            localStorage.removeItem('ecogestion_session');
+            showApp({ name: 'Administrateur', school: 'EcoGestion - Gestion Systeme' }, true);
+            return;
+        }
+        const users = getUsers();
+        if (!users[uid]) { showAuthError('Identifiant introuvable. Veuillez vous inscrire.'); return; }
+        if (users[uid].password !== pass) { showAuthError('Mot de passe incorrect.'); return; }
+        if (users[uid].status === 'pending') { showAuthError('Votre compte est en attente de validation par l\'administrateur.'); return; }
+        if (users[uid].status === 'disabled') { showAuthError('Votre compte a ete desactive par l\'administrateur.'); return; }
+        isAdmin = false;
+        currentUser = uid;
+        localStorage.setItem('ecogestion_session', uid);
+        localStorage.removeItem('ecogestion_admin');
+        loadDB();
+        showApp(users[uid], false);
+    });
+    document.getElementById('register-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('reg-name').value.trim();
+        const uid = document.getElementById('reg-username').value.trim().toLowerCase();
+        const pass = document.getElementById('reg-pass').value;
+        const pass2 = document.getElementById('reg-pass2').value;
+        const school = document.getElementById('reg-school').value.trim();
+        if (!name || !uid || !pass || !pass2) { showAuthError('Veuillez remplir tous les champs obligatoires.'); return; }
+        if (uid === ADMIN_UID) { showAuthError('Cet identifiant est reserve.'); return; }
+        if (pass.length < 4) { showAuthError('Le mot de passe doit avoir au moins 4 caracteres.'); return; }
+        if (pass !== pass2) { showAuthError('Les mots de passe ne correspondent pas.'); return; }
+        if (uid.length < 2) { showAuthError('L\'identifiant doit avoir au moins 2 caracteres.'); return; }
+        const users = getUsers();
+        if (users[uid]) { showAuthError('Cet identifiant est deja utilise.'); return; }
+        users[uid] = { name: name, password: pass, school: school || 'Ecole Primaire', created: new Date().toISOString(), status: 'pending' };
+        saveUsers(users);
+        switchAuthTab('login');
+        showAuthMsg('Inscription reussie ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter apres approbation.');
+        document.getElementById('reg-name').value = '';
+        document.getElementById('reg-username').value = '';
+        document.getElementById('reg-pass').value = '';
+        document.getElementById('reg-pass2').value = '';
+        document.getElementById('reg-school').value = '';
+        document.getElementById('username').value = uid;
     });
     document.querySelectorAll('.ni[data-v]').forEach(b => {
         b.addEventListener('click', () => nav(b.dataset.v, b));
     });
 });
 
+function showApp(info, admin) {
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    if (admin) {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+        document.getElementById('user-name').textContent = info.name;
+        document.getElementById('user-avatar').textContent = 'AD';
+        document.getElementById('user-role').textContent = info.school;
+        renderAdminUsers();
+    } else {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        document.getElementById('user-name').textContent = info.name || currentUser;
+        document.getElementById('user-avatar').textContent = (info.name || currentUser).substring(0,2).toUpperCase();
+        document.getElementById('user-role').textContent = info.school || 'Ecole Primaire';
+        renderDash();
+    }
+}
+
+function showAuthError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('auth-msg').style.display = 'none';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+function showAuthMsg(msg) {
+    const el = document.getElementById('auth-msg');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('auth-error').style.display = 'none';
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+
+function switchAuthTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('act'));
+    document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('act'));
+    document.getElementById('auth-error').style.display = 'none';
+    document.getElementById('auth-msg').style.display = 'none';
+    if (tab === 'login') {
+        document.querySelector('.auth-tab:first-child').classList.add('act');
+        document.getElementById('panel-login').classList.add('act');
+    } else {
+        document.querySelector('.auth-tab:last-child').classList.add('act');
+        document.getElementById('panel-register').classList.add('act');
+    }
+}
+
 // ==================== AUTH ====================
 function doLogout() {
-    localStorage.removeItem('ecogestion_auth');
-    location.reload();
+    currentUser = null; isAdmin = false; adminFilter = 'all';
+    DB = { classes: [], students: [], subjects: {}, evaluations: {}, propositions: {}, essais: [], settings: {} };
+    localStorage.removeItem('ecogestion_session');
+    localStorage.removeItem('ecogestion_admin');
+    document.getElementById('auth').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    document.getElementById('username').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('reg-name').value = '';
+    document.getElementById('reg-username').value = '';
+    document.getElementById('reg-pass').value = '';
+    document.getElementById('reg-pass2').value = '';
+    document.getElementById('reg-school').value = '';
+    switchAuthTab('login');
+}
+
+// ==================== ADMIN USER MANAGEMENT ====================
+function renderAdminUsers() {
+    const users = getUsers();
+    const keys = Object.keys(users);
+    const statsEl = document.getElementById('admin-stats');
+    let pending = 0, approved = 0, disabled = 0;
+    keys.forEach(k => {
+        if (users[k].status === 'pending') pending++;
+        else if (users[k].status === 'disabled') disabled++;
+        else approved++;
+    });
+    statsEl.innerHTML =
+        '<div class="sc"><div class="si bg-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + keys.length + '</div><div style="font-size:.8rem;color:var(--tm)">Total comptes</div></div></div>' +
+        '<div class="sc"><div class="si bg-g"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + approved + '</div><div style="font-size:.8rem;color:var(--tm)">Comptes actives</div></div></div>' +
+        '<div class="sc"><div class="si bg-o"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + pending + '</div><div style="font-size:.8rem;color:var(--tm)">En attente</div></div></div>' +
+        '<div class="sc"><div class="si bg-r"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + disabled + '</div><div style="font-size:.8rem;color:var(--tm)">Desactivees</div></div></div>';
+    filterAdminUsers(adminFilter);
+}
+
+function filterAdminUsers(filter) {
+    adminFilter = filter;
+    document.querySelectorAll('[id^="filter-"]').forEach(b => { b.className = 'btn btn-g btn-sm'; });
+    document.getElementById('filter-' + filter).className = 'btn btn-p btn-sm';
+    const users = getUsers();
+    const container = document.getElementById('admin-users-list');
+    const keys = Object.keys(users).sort();
+    const filtered = keys.filter(k => {
+        if (filter === 'all') return true;
+        if (filter === 'pending') return users[k].status === 'pending';
+        if (filter === 'approved') return users[k].status === 'approved';
+        if (filter === 'disabled') return users[k].status === 'disabled';
+        return true;
+    });
+    if (!filtered.length) {
+        container.innerHTML = '<div class="empty" style="padding:2rem"><p>Aucun utilisateur dans cette categorie.</p></div>';
+        return;
+    }
+    let html = '';
+    filtered.forEach(k => {
+        const u = users[k];
+        const st = u.status || 'pending';
+        const badge = st === 'approved' ? '<span class="badge-ok">Active</span>' : st === 'disabled' ? '<span class="badge-off">Desactivee</span>' : '<span class="badge-wait">En attente</span>';
+        const bgRow = st === 'pending' ? '#fffbeb' : st === 'disabled' ? '#fef2f2' : '#fff';
+        const date = u.created ? new Date(u.created).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'}) : '-';
+        html += '<div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid #f0f0f0;background:' + bgRow + ';flex-wrap:wrap">';
+        html += '<div class="avatar" style="background:' + (st==='approved'?'#dcfce7':st==='disabled'?'#fee2e2':'#fef3c7') + ';color:' + (st==='approved'?'#16a34a':st==='disabled'?'#ef4444':'#d97706') + '">' + u.name.substring(0,2).toUpperCase() + '</div>';
+        html += '<div style="flex:1;min-width:200px"><div style="font-weight:700;font-size:.95rem">' + u.name + ' <span style="color:var(--tm);font-weight:400;font-size:.8rem">(@' + k + ')</span></div>';
+        html += '<div style="font-size:.8rem;color:var(--tm)">' + (u.school||'-') + ' - Inscrit le ' + date + '</div></div>';
+        html += '<div>' + badge + '</div>';
+        html += '<div style="display:flex;gap:.5rem;flex-wrap:wrap">';
+        if (st === 'pending') {
+            html += '<button class="btn btn-p btn-sm" onclick="adminAction(\'' + k + '\',\'approve\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Valider</button>';
+            html += '<button class="btn btn-g btn-sm" onclick="adminAction(\'' + k + '\',\'disable\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Refuser</button>';
+        } else if (st === 'approved') {
+            html += '<button class="btn btn-g btn-sm" onclick="adminAction(\'' + k + '\',\'disable\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Desactiver</button>';
+        } else {
+            html += '<button class="btn btn-p btn-sm" onclick="adminAction(\'' + k + '\',\'approve\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Reactiver</button>';
+        }
+        html += '<button class="btn btn-sm" style="color:#ef4444;background:#fee2e2;border:none" onclick="adminAction(\'' + k + '\',\'delete\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Supprimer</button>';
+        html += '</div></div>';
+    });
+    container.innerHTML = html;
+}
+
+function adminAction(uid, action) {
+    const users = getUsers();
+    if (!users[uid]) return;
+    const uName = users[uid].name;
+    if (action === 'approve') {
+        users[uid].status = 'approved';
+        saveUsers(users);
+        renderAdminUsers();
+        toast(uName + ' : compte active avec succes');
+    } else if (action === 'disable') {
+        users[uid].status = 'disabled';
+        saveUsers(users);
+        renderAdminUsers();
+        toast(uName + ' : compte desactive');
+    } else if (action === 'delete') {
+        if (!confirm('Supprimer definitivement le compte de ' + uName + ' ? Toutes ses donnees seront perdues.')) return;
+        delete users[uid];
+        saveUsers(users);
+        localStorage.removeItem(userDBKey(uid));
+        renderAdminUsers();
+        toast(uName + ' : compte et donnees supprimes');
+    }
 }
 
 // ==================== NAV ====================
-const ALL_VIEWS = ['dashboard','students','inscription','liste','effectifs','carte','certificat','evaluations','eval-tri','eval-classe','proposition','essais','personnel','courses','subjects','notes','settings'];
+const ALL_VIEWS = ['dashboard','students','inscription','liste','effectifs','carte','certificat','evaluations','eval-tri','eval-classe','proposition','essais','personnel','courses','subjects','notes','settings','admin-users'];
 
 function nav(view, btn) {
     ALL_VIEWS.forEach(id => { const el = document.getElementById('v-'+id); if(el) el.classList.add('hidden'); });
@@ -740,6 +1008,7 @@ function nav(view, btn) {
     if (view === 'settings') loadSettingsForm();
     if (view === 'proposition') renderPropositions();
     if (view === 'essais') renderEssais();
+    if (view === 'admin-users' && isAdmin) renderAdminUsers();
     closeSidebar();
 }
 
@@ -1706,4 +1975,3 @@ function formatDate(d) {
 </script>
 </body>
 </html>
-

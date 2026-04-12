@@ -754,24 +754,30 @@ const API = '/api';
 async function apiPost(url, data) {
     try {
         const r = await fetch(API + url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-        return await r.json();
-    } catch(e) { return { error: 'Erreur de connexion. Verifiez votre internet.' }; }
+        const text = await r.text();
+        try { return JSON.parse(text); } catch(e) { return { error: 'Erreur serveur.' }; }
+    } catch(e) { return null; }
 }
 async function apiGet(url) {
     try {
-        const r = await fetch(API + url); return await r.json();
-    } catch(e) { return { error: 'Erreur de connexion.' }; }
+        const r = await fetch(API + url);
+        const text = await r.text();
+        try { return JSON.parse(text); } catch(e) { return { error: 'Erreur serveur.' }; }
+    } catch(e) { return null; }
 }
 async function apiPatch(url, data) {
     try {
         const r = await fetch(API + url, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
-        return await r.json();
-    } catch(e) { return { error: 'Erreur de connexion.' }; }
+        const text = await r.text();
+        try { return JSON.parse(text); } catch(e) { return { error: 'Erreur serveur.' }; }
+    } catch(e) { return null; }
 }
 async function apiDel(url) {
     try {
-        const r = await fetch(API + url, { method: 'DELETE' }); return await r.json();
-    } catch(e) { return { error: 'Erreur de connexion.' }; }
+        const r = await fetch(API + url, { method: 'DELETE' });
+        const text = await r.text();
+        try { return JSON.parse(text); } catch(e) { return { error: 'Erreur serveur.' }; }
+    } catch(e) { return null; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -817,9 +823,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showApp({ name: 'Administrateur', school: 'EcoGestion - Gestion Systeme' }, true);
             return;
         }
-        // Essayer d'abord en ligne (API) pour avoir le statut a jour
+        // Essayer en ligne (API) pour avoir le statut a jour
         const res = await apiPost('/auth/login', { username: uid, password: pass });
-        if (res.ok && !res.isAdmin) {
+        if (res && res.ok && !res.isAdmin) {
             // Mettre a jour le statut local
             const users = getUsers();
             if (users[uid]) {
@@ -834,25 +840,22 @@ document.addEventListener('DOMContentLoaded', () => {
             showApp({ name: res.fullName, school: res.schoolName }, false);
             return;
         }
-        if (res.error) {
-            // Si erreur de statut (pending/disabled), afficher le message
-            if (res.error.includes('attente') || res.error.includes('desactive')) {
-                showAuthError(res.error);
-                return;
-            }
-            // Sinon, fallback offline (localStorage)
-            const users = getUsers();
-            if (!users[uid]) { showAuthError('Identifiant introuvable. Veuillez vous inscrire.'); return; }
-            if (users[uid].password !== pass) { showAuthError('Mot de passe incorrect.'); return; }
-            if (users[uid].status === 'pending') { showAuthError('Votre compte est en attente de validation par l\'administrateur.'); return; }
-            if (users[uid].status === 'disabled') { showAuthError('Votre compte a ete desactive par l\'administrateur.'); return; }
-            isAdmin = false;
-            currentUser = uid;
-            localStorage.setItem('ecogestion_session', uid);
-            localStorage.removeItem('ecogestion_admin');
-            loadDB();
-            showApp(users[uid], false);
+        if (res && res.error && (res.error.includes('attente') || res.error.includes('desactive'))) {
+            showAuthError(res.error);
+            return;
         }
+        // Fallback offline (localStorage)
+        const users = getUsers();
+        if (!users[uid]) { showAuthError('Identifiant introuvable. Veuillez vous inscrire.'); return; }
+        if (users[uid].password !== pass) { showAuthError('Mot de passe incorrect.'); return; }
+        if (users[uid].status === 'pending') { showAuthError('Votre compte est en attente de validation par l\'administrateur.'); return; }
+        if (users[uid].status === 'disabled') { showAuthError('Votre compte a ete desactive par l\'administrateur.'); return; }
+        isAdmin = false;
+        currentUser = uid;
+        localStorage.setItem('ecogestion_session', uid);
+        localStorage.removeItem('ecogestion_admin');
+        loadDB();
+        showApp(users[uid], false);
     });
     document.getElementById('register-form').addEventListener('submit', async e => {
         e.preventDefault();
@@ -866,17 +869,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pass.length < 4) { showAuthError('Le mot de passe doit avoir au moins 4 caracteres.'); return; }
         if (pass !== pass2) { showAuthError('Les mots de passe ne correspondent pas.'); return; }
         if (uid.length < 2) { showAuthError('L\'identifiant doit avoir au moins 2 caracteres.'); return; }
-        // Envoyer l'inscription en ligne pour que l'admin la recoive
-        const res = await apiPost('/auth/register', { fullName: name, username: uid, password: pass, schoolName: school });
-        if (res.error) { showAuthError(res.error); return; }
-        // Sauvegarder aussi en local (offline backup)
+        // Sauvegarder en local d'abord
         const users = getUsers();
-        if (!users[uid]) {
-            users[uid] = { name: name, password: pass, school: school || 'Ecole Primaire', created: new Date().toISOString(), status: 'pending' };
-            saveUsers(users);
+        if (users[uid]) { showAuthError('Cet identifiant est deja utilise.'); return; }
+        users[uid] = { name: name, password: pass, school: school || 'Ecole Primaire', created: new Date().toISOString(), status: 'pending' };
+        saveUsers(users);
+        // Essayer d'envoyer en ligne pour que l'admin la recoive
+        const res = await apiPost('/auth/register', { fullName: name, username: uid, password: pass, schoolName: school });
+        if (res && res.error) {
+            // Annuler l'inscription locale si l'API refuse
+            delete users[uid]; saveUsers(users);
+            showAuthError(res.error); return;
         }
         switchAuthTab('login');
-        showAuthMsg('Inscription envoyee ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter apres approbation.');
+        showAuthMsg('Inscription reussie ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter apres approbation.');
         document.getElementById('reg-name').value = '';
         document.getElementById('reg-username').value = '';
         document.getElementById('reg-pass').value = '';
@@ -1042,21 +1048,22 @@ function filterAdminUsersList(allUsers, filter) {
 async function adminAction(uid, action) {
     const newStatus = action === 'approve' ? 'approved' : action === 'disable' ? 'disabled' : null;
     if (action === 'delete') {
-        const uname = uid;
-        if (!confirm('Supprimer definitivement le compte de @' + uname + ' ?')) return;
+        if (!confirm('Supprimer definitivement le compte de @' + uid + ' ?')) return;
+        // Essayer en ligne
         const res = await apiDel('/admin/users/' + encodeURIComponent(uid));
-        if (res.error) { toast('Erreur: ' + res.error); return; }
-        // Supprimer aussi en local
+        if (res && res.error) { toast('Erreur: ' + res.error); return; }
+        // Supprimer en local
         const users = getUsers();
         if (users[uid]) { delete users[uid]; saveUsers(users); localStorage.removeItem(userDBKey(uid)); }
         renderAdminUsers();
-        toast('@' + uname + ' : compte supprime');
+        toast('@' + uid + ' : compte supprime');
         return;
     }
     if (newStatus) {
+        // Essayer en ligne
         const res = await apiPatch('/admin/users/' + encodeURIComponent(uid), { status: newStatus });
-        if (res.error) { toast('Erreur: ' + res.error); return; }
-        // Mettre a jour en local aussi
+        if (res && res.error) { toast('Erreur: ' + res.error); return; }
+        // Mettre a jour en local
         const users = getUsers();
         if (users[uid]) { users[uid].status = newStatus; saveUsers(users); }
         renderAdminUsers();

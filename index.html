@@ -597,10 +597,10 @@ EcoGestion
 <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
 <h3 style="font-size:.85rem;text-transform:uppercase;color:var(--tm);font-weight:700;letter-spacing:.05em;flex:1">Liste des utilisateurs</h3>
 <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-<button class="btn btn-p btn-sm" onclick="filterAdminUsers('all')" id="filter-all">Tous</button>
-<button class="btn btn-g btn-sm" onclick="filterAdminUsers('pending')" id="filter-pending">En attente</button>
-<button class="btn btn-g btn-sm" onclick="filterAdminUsers('approved')" id="filter-approved">Actives</button>
-<button class="btn btn-g btn-sm" onclick="filterAdminUsers('disabled')" id="filter-disabled">Desactivees</button>
+<button class="btn btn-p btn-sm" onclick="renderAdminUsers('all')" id="filter-all">Tous</button>
+<button class="btn btn-g btn-sm" onclick="renderAdminUsers('pending')" id="filter-pending">En attente</button>
+<button class="btn btn-g btn-sm" onclick="renderAdminUsers('approved')" id="filter-approved">Actives</button>
+<button class="btn btn-g btn-sm" onclick="renderAdminUsers('disabled')" id="filter-disabled">Desactivees</button>
 </div>
 </div>
 <div id="admin-users-list"></div>
@@ -747,8 +747,36 @@ const ADMIN_UID = 'admin';
 const ADMIN_PASS = 'admin123';
 let isAdmin = false;
 let adminFilter = 'all';
+let onlineUsersCache = null;
+
+const API = '/api';
+
+async function apiPost(url, data) {
+    try {
+        const r = await fetch(API + url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+        return await r.json();
+    } catch(e) { return { error: 'Erreur de connexion. Verifiez votre internet.' }; }
+}
+async function apiGet(url) {
+    try {
+        const r = await fetch(API + url); return await r.json();
+    } catch(e) { return { error: 'Erreur de connexion.' }; }
+}
+async function apiPatch(url, data) {
+    try {
+        const r = await fetch(API + url, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+        return await r.json();
+    } catch(e) { return { error: 'Erreur de connexion.' }; }
+}
+async function apiDel(url) {
+    try {
+        const r = await fetch(API + url, { method: 'DELETE' }); return await r.json();
+    } catch(e) { return { error: 'Erreur de connexion.' }; }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    // S'assurer que le compte admin existe en ligne
+    fetch(API + '/seed').catch(() => {});
     const savedSession = localStorage.getItem('ecogestion_session');
     const savedAdmin = localStorage.getItem('ecogestion_admin');
     // Migrate old single-user data if exists
@@ -775,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('ecogestion_session');
         }
     }
-    document.getElementById('login-form').addEventListener('submit', e => {
+    document.getElementById('login-form').addEventListener('submit', async e => {
         e.preventDefault();
         const uid = document.getElementById('username').value.trim().toLowerCase();
         const pass = document.getElementById('login-pass').value;
@@ -789,19 +817,44 @@ document.addEventListener('DOMContentLoaded', () => {
             showApp({ name: 'Administrateur', school: 'EcoGestion - Gestion Systeme' }, true);
             return;
         }
-        const users = getUsers();
-        if (!users[uid]) { showAuthError('Identifiant introuvable. Veuillez vous inscrire.'); return; }
-        if (users[uid].password !== pass) { showAuthError('Mot de passe incorrect.'); return; }
-        if (users[uid].status === 'pending') { showAuthError('Votre compte est en attente de validation par l\'administrateur.'); return; }
-        if (users[uid].status === 'disabled') { showAuthError('Votre compte a ete desactive par l\'administrateur.'); return; }
-        isAdmin = false;
-        currentUser = uid;
-        localStorage.setItem('ecogestion_session', uid);
-        localStorage.removeItem('ecogestion_admin');
-        loadDB();
-        showApp(users[uid], false);
+        // Essayer d'abord en ligne (API) pour avoir le statut a jour
+        const res = await apiPost('/auth/login', { username: uid, password: pass });
+        if (res.ok && !res.isAdmin) {
+            // Mettre a jour le statut local
+            const users = getUsers();
+            if (users[uid]) {
+                users[uid].status = res.status || 'approved';
+                saveUsers(users);
+            }
+            isAdmin = false;
+            currentUser = uid;
+            localStorage.setItem('ecogestion_session', uid);
+            localStorage.removeItem('ecogestion_admin');
+            loadDB();
+            showApp({ name: res.fullName, school: res.schoolName }, false);
+            return;
+        }
+        if (res.error) {
+            // Si erreur de statut (pending/disabled), afficher le message
+            if (res.error.includes('attente') || res.error.includes('desactive')) {
+                showAuthError(res.error);
+                return;
+            }
+            // Sinon, fallback offline (localStorage)
+            const users = getUsers();
+            if (!users[uid]) { showAuthError('Identifiant introuvable. Veuillez vous inscrire.'); return; }
+            if (users[uid].password !== pass) { showAuthError('Mot de passe incorrect.'); return; }
+            if (users[uid].status === 'pending') { showAuthError('Votre compte est en attente de validation par l\'administrateur.'); return; }
+            if (users[uid].status === 'disabled') { showAuthError('Votre compte a ete desactive par l\'administrateur.'); return; }
+            isAdmin = false;
+            currentUser = uid;
+            localStorage.setItem('ecogestion_session', uid);
+            localStorage.removeItem('ecogestion_admin');
+            loadDB();
+            showApp(users[uid], false);
+        }
     });
-    document.getElementById('register-form').addEventListener('submit', e => {
+    document.getElementById('register-form').addEventListener('submit', async e => {
         e.preventDefault();
         const name = document.getElementById('reg-name').value.trim();
         const uid = document.getElementById('reg-username').value.trim().toLowerCase();
@@ -813,12 +866,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pass.length < 4) { showAuthError('Le mot de passe doit avoir au moins 4 caracteres.'); return; }
         if (pass !== pass2) { showAuthError('Les mots de passe ne correspondent pas.'); return; }
         if (uid.length < 2) { showAuthError('L\'identifiant doit avoir au moins 2 caracteres.'); return; }
+        // Envoyer l'inscription en ligne pour que l'admin la recoive
+        const res = await apiPost('/auth/register', { fullName: name, username: uid, password: pass, schoolName: school });
+        if (res.error) { showAuthError(res.error); return; }
+        // Sauvegarder aussi en local (offline backup)
         const users = getUsers();
-        if (users[uid]) { showAuthError('Cet identifiant est deja utilise.'); return; }
-        users[uid] = { name: name, password: pass, school: school || 'Ecole Primaire', created: new Date().toISOString(), status: 'pending' };
-        saveUsers(users);
+        if (!users[uid]) {
+            users[uid] = { name: name, password: pass, school: school || 'Ecole Primaire', created: new Date().toISOString(), status: 'pending' };
+            saveUsers(users);
+        }
         switchAuthTab('login');
-        showAuthMsg('Inscription reussie ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter apres approbation.');
+        showAuthMsg('Inscription envoyee ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter apres approbation.');
         document.getElementById('reg-name').value = '';
         document.getElementById('reg-username').value = '';
         document.getElementById('reg-pass').value = '';
@@ -896,36 +954,56 @@ function doLogout() {
 }
 
 // ==================== ADMIN USER MANAGEMENT ====================
-function renderAdminUsers() {
-    const users = getUsers();
-    const keys = Object.keys(users);
+async function renderAdminUsers(filterParam) {
+    if (filterParam) adminFilter = filterParam;
     const statsEl = document.getElementById('admin-stats');
-    let pending = 0, approved = 0, disabled = 0;
-    keys.forEach(k => {
-        if (users[k].status === 'pending') pending++;
-        else if (users[k].status === 'disabled') disabled++;
-        else approved++;
-    });
+    // Charger les utilisateurs depuis l'API en ligne
+    let allUsers = [];
+    let stats = { total: 0, approved: 0, pending: 0, disabled: 0 };
+    try {
+        const res = await apiGet('/admin/users');
+        if (res.users) {
+            allUsers = res.users;
+            stats = res.stats;
+            onlineUsersCache = res.users;
+        }
+    } catch(e) {}
+    // Si pas de connexion, utiliser localStorage
+    if (!allUsers.length) {
+        const localUsers = getUsers();
+        allUsers = Object.keys(localUsers).map(k => ({
+            username: k,
+            fullName: localUsers[k].name,
+            schoolName: localUsers[k].school,
+            status: localUsers[k].status,
+            createdAt: localUsers[k].created
+        }));
+        allUsers.forEach(u => {
+            if (u.status === 'pending') stats.pending++;
+            else if (u.status === 'disabled') stats.disabled++;
+            else if (u.username !== 'admin') stats.approved++;
+        });
+        stats.total = allUsers.filter(u => u.username !== 'admin').length;
+    }
     statsEl.innerHTML =
-        '<div class="sc"><div class="si bg-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + keys.length + '</div><div style="font-size:.8rem;color:var(--tm)">Total comptes</div></div></div>' +
-        '<div class="sc"><div class="si bg-g"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + approved + '</div><div style="font-size:.8rem;color:var(--tm)">Comptes actives</div></div></div>' +
-        '<div class="sc"><div class="si bg-o"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + pending + '</div><div style="font-size:.8rem;color:var(--tm)">En attente</div></div></div>' +
-        '<div class="sc"><div class="si bg-r"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + disabled + '</div><div style="font-size:.8rem;color:var(--tm)">Desactivees</div></div></div>';
-    filterAdminUsers(adminFilter);
+        '<div class="sc"><div class="si bg-b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + stats.total + '</div><div style="font-size:.8rem;color:var(--tm)">Total comptes</div></div></div>' +
+        '<div class="sc"><div class="si bg-g"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + stats.approved + '</div><div style="font-size:.8rem;color:var(--tm)">Comptes actives</div></div></div>' +
+        '<div class="sc"><div class="si bg-o"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + stats.pending + '</div><div style="font-size:.8rem;color:var(--tm)">En attente</div></div></div>' +
+        '<div class="sc"><div class="si bg-r"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div><div style="font-size:1.5rem;font-weight:800">' + stats.disabled + '</div><div style="font-size:.8rem;color:var(--tm)">Desactivees</div></div></div>';
+    filterAdminUsersList(allUsers, adminFilter);
 }
 
-function filterAdminUsers(filter) {
+function filterAdminUsersList(allUsers, filter) {
     adminFilter = filter;
     document.querySelectorAll('[id^="filter-"]').forEach(b => { b.className = 'btn btn-g btn-sm'; });
     document.getElementById('filter-' + filter).className = 'btn btn-p btn-sm';
-    const users = getUsers();
     const container = document.getElementById('admin-users-list');
-    const keys = Object.keys(users).sort();
-    const filtered = keys.filter(k => {
+    const filtered = allUsers.filter(u => {
+        if (u.username === 'admin') return false;
         if (filter === 'all') return true;
-        if (filter === 'pending') return users[k].status === 'pending';
-        if (filter === 'approved') return users[k].status === 'approved';
-        if (filter === 'disabled') return users[k].status === 'disabled';
+        if (filter === 'pending') return u.status === 'pending';
+        if (filter === 'approved') return u.status === 'approved';
+        if (filter === 'disabled') return u.status === 'disabled';
         return true;
     });
     if (!filtered.length) {
@@ -933,16 +1011,18 @@ function filterAdminUsers(filter) {
         return;
     }
     let html = '';
-    filtered.forEach(k => {
-        const u = users[k];
+    filtered.forEach(u => {
+        const k = u.username;
         const st = u.status || 'pending';
         const badge = st === 'approved' ? '<span class="badge-ok">Active</span>' : st === 'disabled' ? '<span class="badge-off">Desactivee</span>' : '<span class="badge-wait">En attente</span>';
         const bgRow = st === 'pending' ? '#fffbeb' : st === 'disabled' ? '#fef2f2' : '#fff';
-        const date = u.created ? new Date(u.created).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'}) : '-';
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'}) : '-';
+        const name = u.fullName || u.name || k;
+        const school = u.schoolName || u.school || '-';
         html += '<div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid #f0f0f0;background:' + bgRow + ';flex-wrap:wrap">';
-        html += '<div class="avatar" style="background:' + (st==='approved'?'#dcfce7':st==='disabled'?'#fee2e2':'#fef3c7') + ';color:' + (st==='approved'?'#16a34a':st==='disabled'?'#ef4444':'#d97706') + '">' + u.name.substring(0,2).toUpperCase() + '</div>';
-        html += '<div style="flex:1;min-width:200px"><div style="font-weight:700;font-size:.95rem">' + u.name + ' <span style="color:var(--tm);font-weight:400;font-size:.8rem">(@' + k + ')</span></div>';
-        html += '<div style="font-size:.8rem;color:var(--tm)">' + (u.school||'-') + ' - Inscrit le ' + date + '</div></div>';
+        html += '<div class="avatar" style="background:' + (st==='approved'?'#dcfce7':st==='disabled'?'#fee2e2':'#fef3c7') + ';color:' + (st==='approved'?'#16a34a':st==='disabled'?'#ef4444':'#d97706') + '">' + name.substring(0,2).toUpperCase() + '</div>';
+        html += '<div style="flex:1;min-width:200px"><div style="font-weight:700;font-size:.95rem">' + name + ' <span style="color:var(--tm);font-weight:400;font-size:.8rem">(@' + k + ')</span></div>';
+        html += '<div style="font-size:.8rem;color:var(--tm)">' + school + ' - Inscrit le ' + date + '</div></div>';
         html += '<div>' + badge + '</div>';
         html += '<div style="display:flex;gap:.5rem;flex-wrap:wrap">';
         if (st === 'pending') {
@@ -959,27 +1039,29 @@ function filterAdminUsers(filter) {
     container.innerHTML = html;
 }
 
-function adminAction(uid, action) {
-    const users = getUsers();
-    if (!users[uid]) return;
-    const uName = users[uid].name;
-    if (action === 'approve') {
-        users[uid].status = 'approved';
-        saveUsers(users);
+async function adminAction(uid, action) {
+    const newStatus = action === 'approve' ? 'approved' : action === 'disable' ? 'disabled' : null;
+    if (action === 'delete') {
+        const uname = uid;
+        if (!confirm('Supprimer definitivement le compte de @' + uname + ' ?')) return;
+        const res = await apiDel('/admin/users/' + encodeURIComponent(uid));
+        if (res.error) { toast('Erreur: ' + res.error); return; }
+        // Supprimer aussi en local
+        const users = getUsers();
+        if (users[uid]) { delete users[uid]; saveUsers(users); localStorage.removeItem(userDBKey(uid)); }
         renderAdminUsers();
-        toast(uName + ' : compte active avec succes');
-    } else if (action === 'disable') {
-        users[uid].status = 'disabled';
-        saveUsers(users);
+        toast('@' + uname + ' : compte supprime');
+        return;
+    }
+    if (newStatus) {
+        const res = await apiPatch('/admin/users/' + encodeURIComponent(uid), { status: newStatus });
+        if (res.error) { toast('Erreur: ' + res.error); return; }
+        // Mettre a jour en local aussi
+        const users = getUsers();
+        if (users[uid]) { users[uid].status = newStatus; saveUsers(users); }
         renderAdminUsers();
-        toast(uName + ' : compte desactive');
-    } else if (action === 'delete') {
-        if (!confirm('Supprimer definitivement le compte de ' + uName + ' ? Toutes ses donnees seront perdues.')) return;
-        delete users[uid];
-        saveUsers(users);
-        localStorage.removeItem(userDBKey(uid));
-        renderAdminUsers();
-        toast(uName + ' : compte et donnees supprimes');
+        const label = newStatus === 'approved' ? 'active' : 'desactive';
+        toast('@' + uid + ' : compte ' + label + ' avec succes');
     }
 }
 

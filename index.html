@@ -42,7 +42,7 @@
 <body>
 
   <!-- Lien d'évitement (accessibilité : navigation au clavier) -->
-  <a class="skip-link" href="#accueil">Aller au contenu principal</a>
+  <a class="skip-link" href="#main">Aller au contenu principal</a>
 
   <!-- ============================================================
        EN-TÊTE / NAVIGATION FIXE
@@ -118,7 +118,7 @@
   <!-- Voile sombre derrière le menu mobile -->
   <div class="overlay" id="overlay" hidden></div>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
 
     <!-- ============================================================
          1. ACCUEIL
@@ -273,7 +273,7 @@
         <!--
           MODIFICATION FACILE :
           Ajoutez/supprimez des <li> dans chaque groupe.
-          Le niveau s'exprime avec la classe du badge : level-1 à level-4.
+          Le niveau s'exprime avec la classe du badge : level-2 à level-4.
         -->
         <div class="skills">
           <article class="skill-card reveal">

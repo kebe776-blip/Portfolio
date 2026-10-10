@@ -555,8 +555,6 @@ p { color: var(--text-soft); }
 }
 .btn--ghost:hover { border-color: var(--border-strong); transform: translateY(-2px); color: var(--cyan); }
 
-.btn--small { padding: 0.55rem 1rem; font-size: 0.85rem; border-radius: 10px; }
-
 /* -------------------------------------------------------------
    6. SECTIONS & COMPOSANTS
    ------------------------------------------------------------- */
@@ -590,7 +588,6 @@ p { color: var(--text-soft); }
 .tag.level-4 { color: var(--cyan);  border-color: rgba(34, 211, 238, 0.4);  background: rgba(34, 211, 238, 0.08); }
 .tag.level-3 { color: var(--accent-2); border-color: rgba(61, 123, 255, 0.4); background: rgba(61, 123, 255, 0.08); }
 .tag.level-2 { opacity: 0.92; }
-.tag.level-1 { opacity: 0.7; }
 /* Tag contenant un lien (ex. « voir site ») */
 .tag a {
   color: inherit;
@@ -793,7 +790,6 @@ p { color: var(--text-soft); }
 .project__tagline { color: var(--cyan); font-size: 0.92rem; margin-bottom: 0.9rem; }
 .project__desc { font-size: 0.95rem; margin-bottom: 1.2rem; }
 .project__info .tags { margin-bottom: 1.3rem; }
-.project__links { display: flex; flex-wrap: wrap; gap: 0.7rem; }
 
 .project__top {
   position: relative;
@@ -817,21 +813,6 @@ p { color: var(--text-soft); }
     radial-gradient(circle at 30% 20%, rgba(61, 123, 255, 0.25), transparent 60%),
     var(--surface-2);
   border: 1px dashed var(--border-strong);
-}
-.project__state {
-  position: absolute;
-  top: 10px; right: 10px;
-  padding: 0.25rem 0.6rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: rgba(5, 7, 15, 0.8); /* repli si color-mix non supporté */
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
 }
 
 /* -------------------------------------------------------------
@@ -929,7 +910,6 @@ p { color: var(--text-soft); }
 .footer__nav a { color: var(--muted); font-size: 0.9rem; transition: color 0.25s var(--ease); }
 .footer__nav a:hover { color: var(--cyan); }
 .footer__copy { font-size: 0.88rem; color: var(--muted); }
-.footer__note { padding-top: 1.1rem; color: var(--muted); }
 
 /* Bouton retour en haut */
 .to-top {

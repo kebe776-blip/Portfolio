@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===== SEO de base ===== -->
+  <title>Portfolio — Abdoul Aziz Kébé | Instituteur • Développeur VBA &amp; Vibe Coder</title>
+  <meta name="description" content="Portfolio personnel d'Abdoul Aziz Kébé, instituteur, développeur VBA et Vibe Coder. Projets, compétences et contact." />
+  <meta name="author" content="Abdoul Aziz Kébé" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#05070f" />
+
+  <!-- Open Graph / réseaux sociaux -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Portfolio — Abdoul Aziz Kébé" />
+  <meta property="og:description" content="Projets, compétences et contact." />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- Feuille de style (chemin relatif : compatible GitHub Pages) -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%26lt;%2F%26gt;%3C/text%3E%3C/svg%3E" />
+
+  <!--
+    Application anticipée du thème (évite le clignotement blanc/noir au chargement).
+    Même logique que celle de script.js.
+  -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("portfolio-theme");
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Lien d'évitement (accessibilité : navigation au clavier) -->
+  <a class="skip-link" href="#accueil">Aller au contenu principal</a>
+
+  <!-- ============================================================
+       EN-TÊTE / NAVIGATION FIXE
+       ============================================================ -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+
+      <!-- Logo -->
+      <a href="#accueil" class="logo" aria-label="Retour à l'accueil">
+        Mon Portfolio
+      </a>
+
+      <!-- Navigation principale (ordinateur) -->
+      <nav class="nav" id="nav" aria-label="Navigation principale">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="#accueil">Accueil</a></li>
+          <li><a class="nav__link" href="#a-propos">À propos</a></li>
+          <li><a class="nav__link" href="#competences">Compétences</a></li>
+          <li><a class="nav__link" href="#projets">Projets</a></li>
+          <li><a class="nav__link" href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Actions : thème + menu mobile -->
+      <div class="header__actions">
+        <button
+          type="button"
+          class="btn-theme"
+          id="theme-toggle"
+          aria-label="Changer de thème clair ou sombre"
+          title="Changer de thème">
+          <!-- Icône lune (visible en mode sombre) -->
+          <svg class="icon icon--moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <!-- Icône soleil (visible en mode clair) -->
+          <svg class="icon icon--sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+        </button>
+
+        <!-- Bouton menu mobile (hamburger) -->
+        <button
+          type="button"
+          class="btn-burger"
+          id="burger"
+          aria-label="Ouvrir le menu"
+          aria-controls="mobile-menu"
+          aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Menu mobile (panneau latéral) -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu de navigation" hidden>
+    <!-- Bouton de fermeture explicite (accessible au doigt) -->
+    <button type="button" class="mobile-menu__close" id="menu-close" aria-label="Fermer le menu">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <nav aria-label="Navigation mobile">
+      <ul class="mobile-menu__list">
+        <li><a class="mobile-menu__link" href="#accueil">Accueil</a></li>
+        <li><a class="mobile-menu__link" href="#a-propos">À propos</a></li>
+        <li><a class="mobile-menu__link" href="#competences">Compétences</a></li>
+        <li><a class="mobile-menu__link" href="#projets">Projets</a></li>
+        <li><a class="mobile-menu__link" href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+  <!-- Voile sombre derrière le menu mobile -->
+  <div class="overlay" id="overlay" hidden></div>
+
+  <main id="main">
+
+    <!-- ============================================================
+         1. ACCUEIL
+         ============================================================ -->
+    <section class="hero" id="accueil">
+      <!-- Décor d'arrière-plan -->
+      <div class="hero__bg" aria-hidden="true">
+        <span class="blob blob--1"></span>
+        <span class="blob blob--2"></span>
+        <span class="grid-lines"></span>
+      </div>
+
+      <div class="container hero__content">
+        <!-- Portrait à proximité du nom -->
+        <div class="hero__portrait reveal">
+          <img
+            src="assets/images/abdoul-aziz-kebe.jpg"
+            alt="Portrait d'Abdoul Aziz Kébé"
+            width="120"
+            height="120"
+            decoding="async" />
+        </div>
+
+        <p class="hero__eyebrow reveal">Bonjour, je suis</p>
+
+        <!-- TITRE ACCROCHEUR -->
+        <h1 class="hero__title reveal">
+          Abdoul Aziz Kébé<br />
+          <span class="gradient-text hero__title-role" id="typed-text">Instituteur • Développeur VBA &amp; Vibe Coder</span>
+        </h1>
+
+        <!-- PRÉSENTATION -->
+        <p class="hero__subtitle reveal">
+          Enseignant et développeur, je conçois des applications avec VBA et Excel
+          pour automatiser les tâches, simplifier la gestion administrative et
+          améliorer le suivi des données scolaires. Grâce au vibe coding, je
+          transforme mes idées en solutions numériques concrètes.
+        </p>
+
+        <!-- Boutons d'action -->
+        <div class="hero__actions reveal">
+          <a href="#projets" class="btn btn--primary">
+            Voir mes projets
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#contact" class="btn btn--ghost">Me contacter</a>
+        </div>
+
+        <!-- Statistiques -->
+        <ul class="hero__stats reveal">
+          <li><strong>5</strong><span>Projets réalisés</span></li>
+          <li><strong>3</strong><span>Catégories de technologies</span></li>
+          <li><strong>10</strong><span>Années d'expérience</span></li>
+        </ul>
+      </div>
+
+      <!-- Indicateur de défilement -->
+      <a href="#a-propos" class="scroll-hint" aria-label="Défiler vers la section À propos">
+        <span></span>
+      </a>
+    </section>
+
+    <!-- ============================================================
+         2. À PROPOS — biographie facilement modifiable
+         ============================================================ -->
+    <section class="section" id="a-propos">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="section__index">01</span>
+          <h2 class="section__title">À propos</h2>
+          <p class="section__lead">Quelques mots sur moi et ma façon de travailler.</p>
+        </header>
+
+        <div class="about">
+          <!-- Photo de profil -->
+          <div class="about__media reveal">
+            <div class="about__avatar">
+              <img
+                src="assets/images/abdoul-aziz-kebe.jpg"
+                alt="Portrait d'Abdoul Aziz Kébé"
+                width="280"
+                height="280"
+                loading="lazy"
+                decoding="async" />
+            </div>
+          </div>
+
+          <!-- ===== BIOGRAPHIE : modifiez uniquement le texte ci-dessous ===== -->
+          <div class="about__body reveal">
+            <h3>Abdoul Aziz Kébé</h3>
+            <p class="about__role">Instituteur • Développeur VBA &amp; Vibe Coder — Dakar, Sénégal</p>
+
+            <p>
+              Je suis enseignant, passionné par la transmission du savoir et par
+              l'innovation numérique au service de l'éducation.
+            </p>
+            <p>
+              En parallèle de mon activité d'enseignement, je conçois et développe
+              des applications avec <strong>VBA et Excel</strong> afin d'automatiser
+              les tâches, de simplifier la gestion administrative et d'améliorer le
+              suivi des données scolaires : gestion des classes et des élèves, suivi
+              des évaluations et organisation des informations.
+            </p>
+            <p>
+              Je m'intéresse également au <strong>vibecoding</strong>, une approche qui
+              me permet d'explorer de nouvelles possibilités de développement et de
+              concevoir des applications adaptées aux besoins concrets du milieu
+              éducatif.
+            </p>
+            <p>
+              Curieux, créatif et orienté vers les solutions pratiques, je cherche à
+              développer des outils fiables, intuitifs et accessibles, qui facilitent
+              le quotidien des enseignants et des responsables d'établissement.
+            </p>
+
+            <!-- Vision mise en valeur avec le dégradé déjà utilisé sur le site -->
+            <p class="gradient-text">
+              « Ma vision : mettre la technologie au service de l'éducation pour
+              rendre les tâches plus simples, la gestion plus efficace et le suivi
+              pédagogique plus accessible. »
+            </p>
+
+            <div class="about__facts">
+              <div class="fact"><span class="fact__label">Localisation</span><span class="fact__value">Dakar, Sénégal</span></div>
+              <div class="fact"><span class="fact__label">Disponibilité</span><span class="fact__value">Freelance</span></div>
+              <div class="fact fact--langs">
+                <span class="fact__label">Langues</span>
+                <span class="fact__value fact__value--langs">
+                  <span>Wolof — natif</span>
+                  <span>Français</span>
+                  <span>Anglais</span>
+                </span>
+              </div>
+              <div class="fact"><span class="fact__label">Email</span><span class="fact__value">kebe776@gmail.com</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         3. COMPÉTENCES TECHNIQUES
+         ============================================================ -->
+    <section class="section section--alt" id="competences">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="section__index">02</span>
+          <h2 class="section__title">Compétences</h2>
+          <p class="section__lead">Technologies et outils que j'utilise au quotidien.</p>
+        </header>
+
+        <!--
+          MODIFICATION FACILE :
+          Ajoutez/supprimez des <li> dans chaque groupe.
+          Le niveau s'exprime avec la classe du badge : level-1 à level-4.
+        -->
+        <div class="skills">
+          <article class="skill-card reveal">
+            <div class="skill-card__icon" aria-hidden="true">VBA</div>
+            <h3>Visual Basic &amp; VBA</h3>
+            <p>Automatisation et création d'outils de gestion avec l'écosystème Microsoft.</p>
+            <ul class="tags">
+              <li class="tag level-4">Visual Basic</li>
+              <li class="tag level-4">VBA sous Microsoft Excel</li>
+              <li class="tag level-4">Automatisation des tâches</li>
+              <li class="tag level-3">Création d'applications et d'outils de gestion</li>
+            </ul>
+          </article>
+
+          <article class="skill-card reveal">
+            <div class="skill-card__icon" aria-hidden="true">{ }</div>
+            <h3>IA générative &amp; Vibe Coding</h3>
+            <p>L'intelligence artificielle au service de la conception et du développement.</p>
+            <ul class="tags">
+              <li class="tag level-3">Utilisation d'outils d'intelligence artificielle générative</li>
+              <li class="tag level-4">Vibe coding pour concevoir et développer des applications</li>
+              <li class="tag level-3">Assistance par IA dans le développement et la résolution de problèmes</li>
+            </ul>
+          </article>
+
+          <article class="skill-card reveal">
+            <div class="skill-card__icon" aria-hidden="true">&lt;/&gt;</div>
+            <h3>Frameworks web modernes</h3>
+            <p>Des interfaces et des solutions numériques adaptées aux besoins concrets.</p>
+            <ul class="tags">
+              <li class="tag level-2">Découverte et utilisation de frameworks web modernes</li>
+              <li class="tag level-3">Développement d'interfaces utilisateur</li>
+              <li class="tag level-3">Création de solutions numériques adaptées aux besoins concrets</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. PROJETS
+         ============================================================ -->
+    <section class="section" id="projets">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="section__index">03</span>
+          <h2 class="section__title">Projets</h2>
+          <p class="section__lead">Une sélection de réalisations, en cours et à venir.</p>
+        </header>
+
+        <div class="projects">
+
+          <!-- ===== PROJET PRINCIPAL : GESTIECOLE ===== -->
+          <article class="project project--featured reveal">
+            <div class="project__badge project__badge--live">
+              <span class="pulse"></span> Version 1.0.0 disponible
+            </div>
+
+            <div class="project__body">
+              <div class="project__logo" aria-hidden="true">GE</div>
+
+              <div class="project__info">
+                <h3 class="project__title">GestiEcole</h3>
+                <p class="project__tagline">Logiciel de gestion scolaire pour Windows — version 1.0.0 disponible.</p>
+
+                <!-- DESCRIPTION : modifiez librement -->
+                <p class="project__desc">
+                  GestiEcole est mon projet principal : une application destinée à
+                  faciliter la gestion au sein d'un établissement scolaire
+                  (suivi des élèves, organisation et suivi administratif).
+                  La version 1.0.0 est disponible en téléchargement pour
+                  <strong>Windows</strong> : neuf modules (élèves, classes,
+                  enseignants, évaluations, présences, bulletins, paiements…),
+                  données stockées localement, fonctionnement hors ligne et
+                  conformité au modèle <strong>IA / IEF</strong>.
+                </p>
+
+                <ul class="tags">
+                  <li class="tag">
+                    <a href="https://kebe776-blip.github.io/gestiecole-site/" target="_blank" rel="noopener noreferrer" aria-label="Voir le site officiel de GestiEcole (nouvel onglet)">voir site</a>
+                  </li>
+                </ul>
+                <!-- Démo : site officiel en ligne.
+                     Ajouter le lien du dépôt GitHub s'il devient public. -->
+              </div>
+            </div>
+          </article>
+
+          <!-- ===== PROJETS RÉELS ===== -->
+
+          <article class="project reveal">
+            <div class="project__top">
+              <div class="project__thumb" aria-hidden="true">
+                <span>01</span>
+              </div>
+            </div>
+            <div class="project__info">
+              <h3 class="project__title">Gestion École V2 — Version VBA</h3>
+              <p class="project__desc">
+                Gestion École V2 est une application développée sous VBA Excel
+                destinée à faciliter la gestion administrative d'un établissement
+                scolaire.
+              </p>
+              <p class="project__desc">
+                Elle permet de centraliser les informations essentielles concernant
+                les élèves, les enseignants et les classes, et d'automatiser les
+                tâches courantes afin de réduire les erreurs et le temps de saisie.
+              </p>
+              <p class="project__desc">
+                Cette version améliore l'ergonomie, la fiabilité des données et la
+                structuration globale de l'application.
+              </p>
+              <ul class="tags">
+                <li class="tag level-4">VBA</li>
+                <li class="tag level-3">Microsoft Excel</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="project reveal">
+            <div class="project__top">
+              <div class="project__thumb" aria-hidden="true">
+                <span>02</span>
+              </div>
+            </div>
+            <div class="project__info">
+              <h3 class="project__title">Gestion Classe V2</h3>
+              <p class="project__desc">
+                Gestion Classe V2 est un outil conçu pour aider les enseignants dans
+                le suivi quotidien de leurs classes.
+              </p>
+              <p class="project__desc">
+                L'application permet de gérer les listes d'élèves, d'organiser les
+                informations pédagogiques et de simplifier le suivi scolaire grâce à
+                des tableaux automatisés.
+              </p>
+              <p class="project__desc">
+                La version V2 apporte une meilleure organisation, une interface plus
+                intuitive et des fonctionnalités adaptées aux besoins réels du
+                terrain.
+              </p>
+              <ul class="tags">
+                <li class="tag level-4">VBA</li>
+                <li class="tag level-3">Microsoft Excel</li>
+                <li class="tag level-2">Automatisation des tâches</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="project reveal">
+            <div class="project__top">
+              <div class="project__thumb" aria-hidden="true">
+                <span>03</span>
+              </div>
+            </div>
+            <div class="project__info">
+              <h3 class="project__title">Gestion Essai V3</h3>
+              <p class="project__desc">
+                Gestion Essai V3 est une application développée sous VBA Excel
+                dédiée à la gestion complète des tests d'évaluation des élèves de
+                CM2.
+              </p>
+              <p class="project__desc">
+                Elle permet d'organiser l'ensemble du processus d'évaluation, depuis
+                la préparation des candidats jusqu'à l'analyse des résultats.
+              </p>
+              <ul class="tags">
+                <li class="tag level-4">VBA</li>
+                <li class="tag level-3">Microsoft Excel</li>
+                <li class="tag level-2">Gestion des évaluations</li>
+              </ul>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. CONTACT
+         ============================================================ -->
+    <section class="section" id="contact">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="section__index">04</span>
+          <h2 class="section__title">Contact</h2>
+          <p class="section__lead">Un projet, une question, une opportunité ? Écrivez-moi.</p>
+        </header>
+
+        <div class="contact">
+          <div class="contact__intro reveal">
+            <h3>Travaillons ensemble</h3>
+            <p>
+              Je suis ouvert aux missions freelance et aux
+              collaborations. N'hésitez pas à me contacter via l'un des canaux
+              ci-dessous.
+            </p>
+
+            <!-- E-MAIL -->
+            <a class="contact__mail" href="mailto:kebe776@gmail.com">
+              <span class="contact__mail-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              </span>
+              <span>
+                <small>Adresse e-mail</small>
+                <strong>kebe776@gmail.com</strong>
+              </span>
+            </a>
+
+            <button type="button" class="btn btn--ghost" id="copy-email" data-email="kebe776@gmail.com">
+              Copier l'adresse e-mail
+            </button>
+            <p class="contact__feedback" id="copy-feedback" role="status" aria-live="polite"></p>
+          </div>
+
+          <!-- RÉSEAUX SOCIAUX — remplacez les href par vos profils -->
+          <ul class="socials reveal">
+            <li>
+              <a class="social" href="https://www.linkedin.com/in/[VOTRE_PSEUDO]" target="_blank" rel="noopener noreferrer" aria-label="Profil LinkedIn (nouvel onglet)">
+                <span class="social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.24 8.25h4.5V24H.24V8.25Zm7.6 0h4.31v2.15h.06c.6-1.14 2.07-2.34 4.26-2.34 4.56 0 5.4 3 5.4 6.9V24h-4.5v-7.9c0-1.88-.03-4.3-2.62-4.3-2.62 0-3.02 2.05-3.02 4.16V24h-4.5V8.25Z"/></svg>
+                </span>
+                <span class="social__label">LinkedIn</span>
+              </a>
+            </li>
+            <li>
+              <a class="social" href="https://twitter.com/[VOTRE_PSEUDO]" target="_blank" rel="noopener noreferrer" aria-label="Profil X / Twitter (nouvel onglet)">
+                <span class="social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18.24 2H21.5l-7.13 8.15L22.75 22h-6.62l-5.19-6.78L4.99 22H1.73l7.62-8.71L1.25 2h6.79l4.69 6.2L18.24 2Zm-1.16 18h1.81L7.02 3.9H5.08L17.08 20Z"/></svg>
+                </span>
+                <span class="social__label">X / Twitter</span>
+              </a>
+            </li>
+            <li>
+              <a class="social" href="[Lien portfolio / site perso à personnaliser]" target="_blank" rel="noopener noreferrer" aria-label="Autre lien (nouvel onglet)">
+                <span class="social__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
+                </span>
+                <span class="social__label">Autre</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       PIED DE PAGE
+       ============================================================ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="#accueil" class="logo logo--small">
+        Mon Portfolio
+      </a>
+
+      <nav aria-label="Navigation du pied de page">
+        <ul class="footer__nav">
+          <li><a href="#a-propos">À propos</a></li>
+          <li><a href="#projets">Projets</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <p class="footer__copy">
+        © <span id="year">2026</span> Abdoul Aziz Kébé — Tous droits réservés.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Bouton "retour en haut" -->
+  <button type="button" class="to-top" id="to-top" aria-label="Revenir en haut de la page">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+
+  <!-- Script (chemin relatif) -->
+  <script src="script.js" defer></script>
+</body>
+</html>
